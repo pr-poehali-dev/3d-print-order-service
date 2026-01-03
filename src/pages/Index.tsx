@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 
@@ -239,45 +238,36 @@ const Index = () => {
             <p className="text-xl text-foreground/70">Готовые модели для быстрого заказа</p>
           </div>
 
-          <Tabs defaultValue="all" className="max-w-6xl mx-auto">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-4 mb-8 h-12 rounded-xl">
-              <TabsTrigger value="all">Все</TabsTrigger>
-              <TabsTrigger value="pla">PLA</TabsTrigger>
-              <TabsTrigger value="petg">PETG</TabsTrigger>
-              <TabsTrigger value="sla">SLA</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="all" className="grid md:grid-cols-3 gap-6">
-              {models.map((model) => (
-                <Card key={model.id} className="group hover:scale-105 transition-all duration-300 border-2 overflow-hidden">
-                  <div className="h-48 bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20 flex items-center justify-center">
-                    <Icon name="Box" size={64} className="text-foreground/30 group-hover:scale-110 transition-transform" />
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {models.map((model) => (
+              <Card key={model.id} className="group hover:scale-105 transition-all duration-300 border-2 overflow-hidden">
+                <div className="h-48 bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20 flex items-center justify-center">
+                  <Icon name="Box" size={64} className="text-foreground/30 group-hover:scale-110 transition-transform" />
+                </div>
+                <CardHeader>
+                  <div className="flex items-start justify-between mb-2">
+                    <CardTitle className="text-xl font-heading">{model.name}</CardTitle>
+                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                      {model.material}
+                    </Badge>
                   </div>
-                  <CardHeader>
-                    <div className="flex items-start justify-between mb-2">
-                      <CardTitle className="text-xl font-heading">{model.name}</CardTitle>
-                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
-                        {model.material}
-                      </Badge>
-                    </div>
-                    <CardDescription className="flex items-center gap-4 text-base">
-                      <span className="flex items-center gap-1">
-                        <Icon name="Clock" size={16} />
-                        {model.time}
-                      </span>
-                      <span className="text-2xl font-bold text-primary">{model.price} ₽</span>
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button className="w-full rounded-xl" variant="outline">
-                      <Icon name="ShoppingCart" size={18} className="mr-2" />
-                      Заказать
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </TabsContent>
-          </Tabs>
+                  <CardDescription className="flex items-center gap-4 text-base">
+                    <span className="flex items-center gap-1">
+                      <Icon name="Clock" size={16} />
+                      {model.time}
+                    </span>
+                    <span className="text-2xl font-bold text-primary">{model.price} ₽</span>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button className="w-full rounded-xl" variant="outline">
+                    <Icon name="ShoppingCart" size={18} className="mr-2" />
+                    Заказать
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </section>
 
