@@ -12,6 +12,34 @@ const Index = () => {
   const [material, setMaterial] = useState('pla');
   const [weight, setWeight] = useState(100);
   const [delivery, setDelivery] = useState('standard');
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isVideoExpanded, setIsVideoExpanded] = useState(false);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file && (file.name.endsWith('.stl') || file.name.endsWith('.obj') || file.name.endsWith('.3mf'))) {
+      setUploadedFile(file);
+    }
+  };
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploadedFile(file);
+    }
+  };
 
   const calculatePrice = () => {
     const materialPrices: Record<string, number> = {
@@ -154,6 +182,186 @@ const Index = () => {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="upload" className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-heading font-bold mb-4">
+              Загрузите файл и следите за печатью
+            </h2>
+            <p className="text-xl text-foreground/70">Drag & Drop ваш STL файл и наблюдайте процесс онлайн</p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+            <Card className="border-2 overflow-hidden">
+              <CardHeader>
+                <CardTitle className="text-2xl font-heading flex items-center gap-2">
+                  <Icon name="Upload" size={28} className="text-primary" />
+                  Загрузка файла
+                </CardTitle>
+                <CardDescription>Поддерживаемые форматы: STL, OBJ, 3MF</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  className={`relative border-2 border-dashed rounded-2xl p-12 transition-all duration-300 ${
+                    isDragging
+                      ? 'border-primary bg-primary/5 scale-105'
+                      : uploadedFile
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                  }`}
+                >
+                  <input
+                    type="file"
+                    id="file-upload"
+                    accept=".stl,.obj,.3mf"
+                    onChange={handleFileInput}
+                    className="hidden"
+                  />
+                  
+                  {uploadedFile ? (
+                    <div className="text-center">
+                      <div className="w-20 h-20 mx-auto mb-4 bg-primary/10 rounded-2xl flex items-center justify-center">
+                        <Icon name="FileCheck" size={40} className="text-primary" />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2">{uploadedFile.name}</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                      <div className="flex gap-3 justify-center">
+                        <Button onClick={() => setUploadedFile(null)} variant="outline">
+                          <Icon name="X" size={16} className="mr-2" />
+                          Удалить
+                        </Button>
+                        <Button className="bg-primary hover:bg-primary/90">
+                          <Icon name="Check" size={16} className="mr-2" />
+                          Продолжить
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <label htmlFor="file-upload" className="cursor-pointer block text-center">
+                      <div className="w-20 h-20 mx-auto mb-4 bg-primary/10 rounded-2xl flex items-center justify-center">
+                        <Icon name="Upload" size={40} className="text-primary" />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2">
+                        Перетащите файл сюда
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        или нажмите для выбора файла
+                      </p>
+                      <Button type="button" variant="outline" className="mx-auto">
+                        <Icon name="FolderOpen" size={16} className="mr-2" />
+                        Выбрать файл
+                      </Button>
+                    </label>
+                  )}
+                </div>
+
+                <div className="mt-6 space-y-3">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Icon name="CheckCircle" size={16} className="text-primary" />
+                    <span>Автоматическая проверка геометрии</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Icon name="CheckCircle" size={16} className="text-primary" />
+                    <span>Мгновенный расчёт времени печати</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Icon name="CheckCircle" size={16} className="text-primary" />
+                    <span>Безопасное хранение файлов</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 overflow-hidden relative group">
+              <CardHeader>
+                <CardTitle className="text-2xl font-heading flex items-center gap-2">
+                  <Icon name="Video" size={28} className="text-primary" />
+                  Онлайн-трансляция печати
+                </CardTitle>
+                <CardDescription>Смотрите процесс в реальном времени</CardDescription>
+              </CardHeader>
+              <CardContent className="relative">
+                <div
+                  className={`relative transition-all duration-500 ease-in-out ${
+                    isVideoExpanded ? 'scale-150 z-50' : 'scale-100'
+                  }`}
+                  onMouseEnter={() => setIsVideoExpanded(true)}
+                  onMouseLeave={() => setIsVideoExpanded(false)}
+                >
+                  <div className="relative aspect-video rounded-2xl overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-foreground/80 rounded-full blur-xl" 
+                             style={{
+                               clipPath: 'circle(40% at 50% 50%)',
+                             }}
+                        />
+                        <div 
+                          className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-foreground/20 shadow-2xl"
+                          style={{
+                            clipPath: 'circle(50% at 50% 50%)',
+                          }}
+                        >
+                          <div className="w-full h-full bg-gradient-to-br from-orange-500/30 via-gray-600/30 to-gray-800/30 flex items-center justify-center">
+                            <div className="text-center">
+                              <Icon name="Play" size={48} className="text-primary mx-auto mb-2 animate-pulse" />
+                              <p className="text-sm font-medium">Трансляция</p>
+                              <p className="text-xs text-muted-foreground">Активна</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {isVideoExpanded && (
+                      <div className="absolute inset-0 bg-background/95 backdrop-blur-sm flex items-center justify-center transition-opacity duration-300">
+                        <div className="text-center p-6">
+                          <Icon name="Maximize2" size={48} className="text-primary mx-auto mb-4" />
+                          <h3 className="text-xl font-semibold mb-2">Увеличенный просмотр</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Здесь будет полноэкранная трансляция
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-6 grid grid-cols-3 gap-4 text-center">
+                  <div className="p-3 bg-muted/50 rounded-xl">
+                    <div className="text-2xl font-bold text-primary">73%</div>
+                    <div className="text-xs text-muted-foreground">Готово</div>
+                  </div>
+                  <div className="p-3 bg-muted/50 rounded-xl">
+                    <div className="text-2xl font-bold text-primary">2:15</div>
+                    <div className="text-xs text-muted-foreground">Осталось</div>
+                  </div>
+                  <div className="p-3 bg-muted/50 rounded-xl">
+                    <div className="text-2xl font-bold text-primary">210°C</div>
+                    <div className="text-xs text-muted-foreground">Температура</div>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium">Прогресс печати</span>
+                    <span className="text-sm text-muted-foreground">Слой 142 из 195</span>
+                  </div>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all duration-500" style={{ width: '73%' }}></div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
